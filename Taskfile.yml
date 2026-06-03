@@ -1,0 +1,69 @@
+version: '3'
+
+vars:
+  BINARY_NAME: tswitch
+  INSTALL_PATH: /usr/local/bin
+
+tasks:
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list-all
+    silent: true
+
+  build:
+    desc: Build the tswitch binary
+    sources:
+      - '*.go'
+      - 'go.mod'
+      - 'go.sum'
+    generates:
+      - '{{.BINARY_NAME}}'
+    cmds:
+      - go build -o {{.BINARY_NAME}} -ldflags="-s -w"
+      - echo "Built {{.BINARY_NAME}}"
+
+  install:
+    desc: Install tswitch to system PATH
+    deps:
+      - build
+    cmds:
+      - sudo mv {{.BINARY_NAME}} {{.INSTALL_PATH}}/{{.BINARY_NAME}}
+      - echo "Installed {{.BINARY_NAME}} to {{.INSTALL_PATH}}"
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v ./...
+
+  test:coverage:
+    desc: Run tests with coverage
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - echo "Coverage report generated at coverage.html"
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -f {{.BINARY_NAME}}
+      - rm -f coverage.out coverage.html
+      - echo "Cleaned build artifacts"
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - go fmt ./...
+      - echo "Code formatted"
+
+  lint:
+    desc: Run linter (requires golangci-lint)
+    cmds:
+      - golangci-lint run
+
+  dev:
+    desc: Build and run for development
+    deps:
+      - build
+    cmds:
+      - ./{{.BINARY_NAME}} {{.CLI_ARGS}}
