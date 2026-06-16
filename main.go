@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/gernotglawe/taskwarrior-switch/taskwarrior"
 )
 
 func main() {
@@ -18,7 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := switchTask(newTaskID); err != nil {
+	if err := taskwarrior.SwitchTask(newTaskID); err != nil {
 		fmt.Fprintf(os.Stderr, "switch task: %v\n", err)
 		os.Exit(1)
 	}
