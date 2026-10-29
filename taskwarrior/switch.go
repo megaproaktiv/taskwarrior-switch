@@ -45,8 +45,8 @@ func findActiveTask() (int, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Skip header and empty lines
-		if strings.HasPrefix(line, "ID ") || strings.TrimSpace(line) == "" {
+		// Skip header and empty lines (case-insensitive header match)
+		if isHeaderLine(line) || strings.TrimSpace(line) == "" {
 			continue
 		}
 
@@ -67,6 +67,12 @@ func findActiveTask() (int, error) {
 	}
 
 	return 0, nil
+}
+
+// isHeaderLine reports whether a line is the "todo ls" header row,
+// ignoring case so headers like "ID ", "id ", or "Id " are all recognized.
+func isHeaderLine(line string) bool {
+	return strings.HasPrefix(strings.ToLower(line), "id ")
 }
 
 // stopTask stops the specified task.

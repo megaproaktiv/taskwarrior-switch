@@ -43,6 +43,19 @@ func TestParseActiveTask(t *testing.T) {
  9 * conrad    Email Architecture`,
 			wantID: 9,
 		},
+		{
+			name: "lowercase header is ignored",
+			todoOutput: `id a project   description
+10   otto      step by step
+ 5 * education Dashboard`,
+			wantID: 5,
+		},
+		{
+			name: "mixed case header is ignored",
+			todoOutput: `Id A Project   Description
+ 7 * presales  Davero`,
+			wantID: 7,
+		},
 	}
 
 	for _, tt := range tests {
@@ -58,7 +71,7 @@ func TestParseActiveTask(t *testing.T) {
 // parseActiveTaskFromOutput mirrors the parsing logic in findActiveTask for testing.
 func parseActiveTaskFromOutput(output string) int {
 	for line := range strings.SplitSeq(output, "\n") {
-		if strings.HasPrefix(line, "ID ") || strings.TrimSpace(line) == "" {
+		if strings.HasPrefix(strings.ToLower(line), "id ") || strings.TrimSpace(line) == "" {
 			continue
 		}
 
